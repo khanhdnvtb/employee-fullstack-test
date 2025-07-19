@@ -1,0 +1,89 @@
+<div class="wa-card wa-padding--md wa-margin-top--md">
+    <form hx-post="/products" hx-target="#product-section" hx-swap="innerHTML">
+        <!-- Product fields -->
+        <div class="wa-field">
+            <wa-input id="title" label="Title" name="title" th:value="${product.title}" class="wa-input" required/>
+        </div>
+        <div class="wa-field">
+            <wa-input id="handle" label="Handle" name="handle" th:value="${product.handle}" class="wa-input" required/>
+        </div>
+        <div class="wa-field">
+            <wa-input id="vendor" label="Vendor" name="vendor" th:value="${product.vendor}" class="wa-input" required/>
+        </div>
+        <div class="wa-field">
+            <wa-select required label="Type" id="productType" name="productType" class="wa-input">
+                <wa-option th:each="type : ${productTypes}"
+                        th:value="${type}"
+                        th:text="${type}" th:selected="${type} == ${product.productType}"></wa-option>
+            </wa-select>
+        </div>
+
+        <!-- Variants (optional) -->
+        <div class="wa-field wa-margin-top--lg">
+            <h3>Variants (optional)</h3>
+            <div id="variants-container">
+                <div class="variant-block wa-card wa-padding--sm wa-margin-bottom--sm"
+                     style="border:1px solid #e0e0e0; border-radius:8px; margin-bottom:0.5rem; padding:1rem; position:relative;">
+                    <div class="wa-field">
+                        <wa-input label="Title" name="variants[0].title" class="wa-input"/>
+                    </div>
+                    <div class="wa-field">
+                        <wa-input label="Option 1" name="variants[0].option1" class="wa-input"/>
+                    </div>
+                    <div class="wa-field">
+                        <wa-input label="Option 2" name="variants[0].option2" class="wa-input"/>
+                    </div>
+                    <div class="wa-field">
+                        <wa-input label="Option 3" name="variants[0].option3" class="wa-input"/>
+                    </div>
+                    <div class="wa-field">
+                        <wa-input label="Sku" name="variants[0].sku" class="wa-input"/>
+                    </div>
+                    <div class="wa-field wa-flex wa-items-center" style="padding: 5px 0">
+                        <input type="checkbox" id="variants-0-requiresShipping" name="variants[0].requiresShipping" value="true"> Requires Shipping
+                    </div>
+                    <div class="wa-field wa-flex wa-items-center" style="padding: 5px 0">
+                        <input type="checkbox" id="taxable0" name="variants[0].taxable" value="true"> Taxable
+                    </div>
+                    <div class="wa-field wa-flex wa-items-center" style="padding: 5px 0">
+                        <input type="checkbox" id="available0" name="variants[0].available" value="true"> Available
+                    </div>
+                    <div class="wa-field">
+                        <wa-input label="Price" name="variants[0].price" type="number" step="0.01" class="wa-input"/>
+                    </div>
+                    <div class="wa-field">
+                        <wa-input label="Compare At Price" name="variants[0].compareAtPrice" type="number" step="0.01" class="wa-input"/>
+                    </div>
+                    <div class="wa-field">
+                        <wa-input label="Grams" name="variants[0].grams" type="number" class="wa-input"/>
+                    </div>
+                </div>
+            </div>
+            <wa-button type="button" class="wa-button wa-button--accent" id="add-variant-btn">
+                <i class="wa-icon wa-icon--plus"></i> Add Variant
+            </wa-button>
+        </div>
+
+        <!-- Images (optional) -->
+        <div class="wa-field wa-margin-top--lg">
+            <h3>Images (optional)</h3>
+            <div id="images-container">
+                <div class="image-block wa-field wa-margin-bottom--sm"
+                     style="border:1px solid #e0e0e0; border-radius:8px; margin-bottom:0.5rem; padding:1rem; position:relative;">
+                    <wa-input label="Image URL" name="images[0].src" class="wa-input"/>
+                </div>
+            </div>
+            <wa-button type="button" class="wa-button wa-button--accent" id="add-image-btn">
+                <i class="wa-icon wa-icon--plus"></i> Add Image
+            </wa-button>
+        </div>
+
+        <!-- Submit -->
+        <div class="button-group">
+            <wa-button type="submit" class="btn-save wa-button wa-button--primary wa-width--full">
+               Save
+            </wa-button>
+        </div>
+    </form>
+
+</div>

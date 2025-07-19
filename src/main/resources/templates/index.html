@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Management</title>
+    <link rel="stylesheet" href="https://early.webawesome.com/webawesome@3.0.0-beta.2/dist/styles/webawesome.css"/>
+    <script type="module" src="https://early.webawesome.com/webawesome@3.0.0-beta.2/dist/webawesome.loader.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.1"></script>
+    <style>
+        :root {
+            --color-primary: #4a90e2;
+            --color-primary-dark: #3a78c2;
+            --color-accent: #28a745;
+            --color-bg: #f4f6f8;
+            --color-card: #ffffff;
+            --color-text: #333333;
+            --color-border: #e0e0e0;
+            --radius-base: 8px;
+            --spacing: 1rem;
+            --transition-speed: 0.2s;
+        }
+
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: var(--color-bg);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            color: var(--color-text);
+            line-height: 1.6;
+            padding-bottom: var(--spacing);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        header.wa-bar {
+            background: var(--color-primary);
+            color: #fff;
+            padding: calc(var(--spacing) * 0.75) 0;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        header .wa-bar__content h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+
+        .wa-container {
+            max-width: 900px;
+            margin: auto;
+            padding: var(--spacing);
+        }
+
+        .wa-card {
+            background: var(--color-card);
+            border-radius: var(--radius-base);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            padding: 0 var(--spacing);
+            margin-bottom: var(--spacing);
+        }
+
+        /* === Tables === */
+        .wa-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: var(--radius-base);
+            overflow: hidden;
+            background: var(--color-card);
+        }
+
+        .wa-table th,
+        .wa-table td {
+            padding: calc(var(--spacing) * 0.75);
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .wa-table thead {
+            background: var(--color-primary);
+            color: #fff;
+        }
+
+        .wa-table tbody tr:hover {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        /* === Form Fields === */
+        .wa-field {
+            margin-bottom: 0.5rem;
+        }
+
+        .wa-field label {
+            display: block;
+            font-weight: 500;
+        }
+
+        .wa-input {
+            width: 100%;
+            max-width: 100%;
+            border-radius: var(--radius-base);
+            transition: border-color var(--transition-speed);
+        }
+
+        .wa-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        /* === Buttons === */
+        .wa-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-base);
+            font-size: 0.95rem;
+            font-weight: 500;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: background-color var(--transition-speed), border-color var(--transition-speed), color var(--transition-speed);
+        }
+
+        .wa-button i {
+            margin-right: 0.4rem;
+        }
+
+        .wa-button--accent {
+            color: #fff;
+        }
+
+        .wa-button--accent:hover {
+            background: var(--color-primary-dark);
+            border-color: var(--color-primary-dark);
+        }
+
+        .wa-button--success {
+            color: #fff;
+        }
+
+        .wa-button--primary {
+            background: #fff;
+            color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        .wa-button--primary:hover {
+            background: rgba(74, 144, 226, 0.1);
+        }
+
+        .wa-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* === Layout Helpers === */
+        .button-group {
+            text-align: center;
+            margin-bottom: var(--spacing);
+        }
+
+        .wa-flex {
+            display: flex;
+            align-items: center;
+        }
+
+        .wa-ml-sm {
+            margin-left: 0.5rem;
+        }
+
+        .wa-width--full {
+            width: 100%;
+        }
+
+        @media (max-width: 600px) {
+            .wa-container {
+                padding: calc(var(--spacing) * 0.5);
+            }
+
+            .wa-input {
+                font-size: 0.9rem;
+            }
+
+            .wa-button {
+                font-size: 0.9rem;
+                padding: 0.5rem 1rem;
+            }
+
+            .wa-table th, .wa-table td {
+                padding: 0.5rem;
+            }
+        }
+
+        wa-button.close::part(base) {
+            background: unset !important;
+            color: black;
+        }
+        wa-button.btn-save::part(base) {
+            background: unset;
+            color: var(--color-primary);
+        }
+
+        wa-option {
+            padding: 5px 0;
+        }
+
+        .text-field {
+            &:focus-within {
+                outline: unset;
+            }
+        }
+        input[type='checkbox'] {
+            margin-right: 5px;
+        }
+    </style>
+
+</head>
+<body hx-boost="true">
+<header class="wa-bar wa-bar--primary">
+    <div class="wa-bar__content">
+        <h1 style="text-align: center">Products Management</h1>
+    </div>
+</header>
+<main class="wa-container wa-margin-top--lg">
+    <div class="button-group" style="display: flex; gap: 1rem; justify-content: center;">
+        <wa-button class="wa-button wa-button--accent"
+                   appearance="filled outlined" variant="brand"
+                   hx-get="/products"
+                   hx-target="#product-section"
+                   hx-swap="innerHTML">
+            <i class="wa-icon wa-icon--refresh"></i> Load Products
+        </wa-button>
+        <wa-button class="wa-button wa-button--success" id="create-product-btn" appearance="filled outlined"
+                   variant="success" type="button">
+            <i class="wa-icon wa-icon--plus"></i> Create Product
+        </wa-button>
+    </div>
+
+    <section id="product-section" class="wa-margin-top--md"></section>
+    <div id="modal-backdrop"
+         style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.4);align-items:center;justify-content:center;z-index:9999;">
+        <div id="modal-content"
+             style="background:#fff; border-radius:8px; max-width:600px; width:100%; max-height:90vh; box-shadow:0 2px 16px rgba(0,0,0,0.2); position:relative; display:flex; flex-direction:column;">
+            <wa-button id='close-modal-btn' class="close"
+                    style='position:absolute;top:10px;right:10px;font-size:1.5rem;background:none;border:none;cursor:pointer;'>
+                &times;
+            </wa-button>
+            <div id="modal-body" style='padding:2rem; overflow-y:auto; max-height:80vh;'></div>
+        </div>
+    </div>
+    <script>
+        document.getElementById('create-product-btn').addEventListener('click', function () {
+            fetch('/products/new-form')
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById('modal-body').innerHTML = html;
+                    document.getElementById('modal-backdrop').style.display = 'flex';
+                    const form = document.querySelector('#modal-body form');
+                    if (form && window.htmx) htmx.process(form);
+                    attachProductFormEvents();
+                });
+        });
+        document.getElementById('close-modal-btn').onclick = function () {
+            document.getElementById('modal-backdrop').style.display = 'none';
+        };
+        document.body.addEventListener('htmx:afterSwap', function (evt) {
+            if (evt.target.id === 'product-section') {
+                document.getElementById('modal-backdrop').style.display = 'none';
+            }
+        });
+
+        function attachProductFormEvents() {
+            let variantIndex = document.querySelectorAll('#variants-container .variant-block').length;
+            let imageIndex = document.querySelectorAll('#images-container .image-block').length;
+            
+            const addVariantBtn = document.getElementById('add-variant-btn');
+            if (addVariantBtn) {
+                addVariantBtn.onclick = function () {
+                    const container = document.getElementById('variants-container');
+                    const blocks = container.querySelectorAll('.variant-block');
+                    const newIndex = blocks.length;
+                    const block = blocks[0].cloneNode(true);
+                    
+                    block.querySelectorAll('wa-input, wa-select, input[type="checkbox"]').forEach(inp => {
+                        let name = inp.getAttribute('name');
+                        if (!name) return;
+                        name = name.replace(/\[\d+\]/, `[${newIndex}]`);
+                        inp.setAttribute('name', name);
+                        if (inp.tagName.toLowerCase() === 'input' && inp.type === 'checkbox') {
+                            const field = inp.id.replace(/\d+$/, '');
+                            const newId = field + newIndex;
+                            inp.id = newId;
+                            const label = inp.parentElement.querySelector('label[for]');
+                            if (label) label.setAttribute('for', newId);
+                            inp.checked = false;
+                            block.querySelectorAll('input[type="hidden"][name="' + name + '"]').forEach(h => h.remove());
+                            const hidden = document.createElement('input');
+                            hidden.type = 'hidden';
+                            hidden.name = name;
+                            hidden.value = 'false';
+                            inp.parentElement.insertBefore(hidden, inp);
+                        } else {
+                            inp.value = '';
+                        }
+                    });
+                    block.querySelectorAll('input[type="hidden"]').forEach(h => h.remove());
+                    container.appendChild(block);
+                    updateVariantLabels();
+                };
+            }
+            
+            const addImageBtn = document.getElementById('add-image-btn');
+            if (addImageBtn) {
+                addImageBtn.onclick = function () {
+                    const container = document.getElementById('images-container');
+                    const blocks = container.querySelectorAll('.image-block');
+                    const newIndex = blocks.length;
+                    const block = blocks[0].cloneNode(true);
+                    
+                    block.querySelectorAll('wa-input, input[type="hidden"]').forEach(inp => {
+                        let name = inp.getAttribute('name');
+                        if (!name) return;
+                        name = name.replace(/\[\d+\]/, `[${newIndex}]`);
+                        inp.setAttribute('name', name);
+                        if (inp.type === 'hidden') {
+                            inp.value = '';
+                        } else {
+                            inp.value = '';
+                        }
+                    });
+                    container.appendChild(block);
+                    updateImageLabels();
+                };
+            }
+
+            function updateVariantLabels() {
+                const blocks = document.querySelectorAll('#variants-container .variant-block');
+                blocks.forEach((block, idx) => {
+                    let label = block.querySelector('.variant-label');
+                    if (!label) {
+                        label = document.createElement('div');
+                        label.className = 'variant-label';
+                        label.style.position = 'absolute';
+                        label.style.top = '0.5rem';
+                        label.style.right = '1rem';
+                        label.style.fontSize = '0.9rem';
+                        label.style.color = '#888';
+                        block.appendChild(label);
+                    }
+                    label.textContent = `Variant #${idx + 1}`;
+                });
+            }
+
+            function updateImageLabels() {
+                const blocks = document.querySelectorAll('#images-container .image-block');
+                blocks.forEach((block, idx) => {
+                    let label = block.querySelector('.image-label');
+                    if (!label) {
+                        label = document.createElement('div');
+                        label.className = 'image-label';
+                        label.style.position = 'absolute';
+                        label.style.top = '0.5rem';
+                        label.style.right = '1rem';
+                        label.style.fontSize = '0.9rem';
+                        label.style.color = '#888';
+                        block.appendChild(label);
+                    }
+                    label.textContent = `Image #${idx + 1}`;
+                });
+            }
+        }
+    </script>
+    <script>
+        document.addEventListener('submit', function(e) {
+            if (e.target.matches('form[hx-post="/products"]')) {
+                e.target.querySelectorAll('input[type="hidden"].wa-dynamic').forEach(el => el.remove());
+
+                const variantBlocks = document.querySelectorAll('#variants-container .variant-block');
+                
+                variantBlocks.forEach((block, index) => {
+                    const inputs = block.querySelectorAll('wa-input, wa-select, wa-checkbox');
+                    
+                    inputs.forEach(input => {
+                        const name = input.getAttribute('name');
+                        if (!name) return;
+                        if (input.tagName.toLowerCase() === 'input' && input.type === 'checkbox') {
+                            return;
+                        }
+                        const value = input.value;
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = name;
+                        hiddenInput.value = value;
+                        hiddenInput.classList.add('wa-dynamic');
+                        e.target.appendChild(hiddenInput);
+                    });
+                });
+
+                const imageBlocks = document.querySelectorAll('#images-container .image-block');
+                imageBlocks.forEach((block, index) => {
+                    const inputs = block.querySelectorAll('wa-input');
+                    inputs.forEach(input => {
+                        const name = input.getAttribute('name');
+                        if (name) {
+                            const value = input.value;
+                            const hiddenInput = document.createElement('input');
+                            hiddenInput.type = 'hidden';
+                            hiddenInput.name = name;
+                            hiddenInput.value = value;
+                            hiddenInput.classList.add('wa-dynamic');
+                            e.target.appendChild(hiddenInput);
+                        }
+                    });
+                });
+
+                const productInputs = e.target.querySelectorAll('wa-input[name="title"], wa-input[name="handle"], wa-input[name="vendor"], wa-select[name="productType"]');
+                productInputs.forEach(input => {
+                    const name = input.getAttribute('name');
+                    const value = input.value;
+                    if (name && value) {
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = name;
+                        hiddenInput.value = value;
+                        hiddenInput.classList.add('wa-dynamic');
+                        e.target.appendChild(hiddenInput);
+                    }
+                });
+
+                const formData = new FormData(e.target);
+                for (let [key, value] of formData.entries()) {
+                    console.log(key, '=', value);
+                }
+            }
+        });
+    </script>
+</main>
+</body>
+</html>

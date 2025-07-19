@@ -1,0 +1,24 @@
+<div th:fragment="productTable">
+    <div class="wa-card wa-padding--sm wa-margin-bottom--md" style="max-height:80vh;overflow-y:auto;">
+        <table class="wa-table wa-table--striped wa-table--responsive">
+            <thead>
+            <tr>
+                <th>No</th>
+                <th>Title</th>
+                <th>Handle</th>
+                <th>Vendor</th>
+                <th>Type</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p, iter : ${products}">
+                <td th:text="${iter.index + 1}"></td>
+                <td th:text="${p.title}"></td>
+                <td th:text="${p.handle}"></td>
+                <td th:text="${p.vendor}"></td>
+                <td th:text="${p.productType}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
